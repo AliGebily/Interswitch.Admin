@@ -1,0 +1,518 @@
+<div id="message-details-page" class="page-layout carded fullwidth" fusePerfectScrollbar>
+
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+      <!-- APP TITLE -->
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+          <div class="h2">{{currentMessage.first_name+" "+currentMessage.last_name}}
+            <span class="header-delivered-icon">
+              <mat-icon *ngIf="currentMessage.status == 2" class="delivered">
+                delivered_user</mat-icon>
+            </span>
+          </div>
+          <div class="subtitle secondary-text">
+            <span> Registered: {{currentMessage.registration_date | dateFormatter: (currentMessage.status == 2 ? false: true)}}</span>
+            <a *ngIf="currentMessage.status == 2" (click)="profileExpanded = !profileExpanded" href="javascript:;" class="view-profile-link">
+              - View profile
+              <mat-icon *ngIf="!profileExpanded">expand_more</mat-icon>
+              <mat-icon *ngIf="profileExpanded">expand_less</mat-icon>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- / APP TITLE -->
+
+      <div *ngIf="currentMessage.status == 2" class="suspend-activate-container">
+        <button class="mat-warn-bg" mat-raised-button *ngIf="currentMessage.suspension_status == 0" (click)="openSuspendDialog()">
+          Suspend Account
+        </button>
+        <button class="mat-white-bg" mat-raised-button *ngIf="currentMessage.suspension_status == 1" (click)="activateAccount()">
+          Activate Account
+        </button>
+      </div>
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+    <div class="content-card mat-white-bg">
+
+      <mat-card fusePerfectScrollbar>
+        <mat-card-content>
+
+          <!-- suspension details section-->
+          <div *ngIf="currentMessage.suspension_status == 1" class="suspension-details">
+            <div class="py-4" fxLayout="row">
+              <div fxFlex>
+                <div>
+                  <span class="account-suspended"> Account Suspended</span>
+                  <span class="suspension-date"> Suspended {{currentMessage.suspension_date | dateFormatter: true}}</span>
+                </div>
+                <div class="suspension-reason">
+                  <mat-icon>info</mat-icon>
+                  <span>{{currentMessage.suspension_reason}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- suspension details section-->
+
+          <!-- view profile section-->
+          <div *ngIf="profileExpanded" class="view-profile-content">
+            <div class="py-4" fxLayout="row">
+              <div fxFlex class="field-vertical-label">Name</div>
+              <div fxFlex class="field-vertical-label"> Mobile number</div>
+              <div fxFlex class="field-vertical-label">E-mail</div>
+            </div>
+            <div class="py-4" fxLayout="row">
+              <div fxFlex fxLayout="row">
+                <img-thumbnail [class]="'message-photo'" [src]="currentMessage.image?.url"></img-thumbnail>
+                <input readonly matInput [value]="currentMessage.first_name+' '+currentMessage.last_name" class="field-vertical-value">
+              </div>
+              <div fxFlex>
+                <input readonly matInput [value]="currentMessage.phone_number || ''" class="field-vertical-value">
+                <mat-icon *ngIf="currentMessage.is_phone_number_confirmed" class="delivered">delivered_user</mat-icon>
+              </div>
+              <div fxFlex>
+                <input readonly matInput [value]="currentMessage.email || ''" class="field-vertical-value">
+                <mat-icon *ngIf="currentMessage.is_email_confirmed" class="delivered">delivered_user</mat-icon>
+              </div>
+            </div>
+            <div class="py-4" fxLayout="row" *ngIf="currentMessage.status == 2">
+              <div fxFlex class="average-response-time">
+                Average Response Time: {{currentMessage.average_response_hours}} hours
+              </div>
+            </div>
+            <mat-tab-group class="more-details-tab-group">
+              <mat-tab label="National ID" *ngIf="currentMessage.national_id">
+                <div class="tab-content national-id-tab" fusePerfectScrollbar fxLayout="column">
+                  <!-- rejection details section-->
+                  <div *ngIf="[3, 5].indexOf(currentMessage.national_id.message_status) > -1" class="rejection-details">
+                    <h1 class="title">
+                      Rejection Details
+                      <a (click)="rejectionDetailsExpanded = !rejectionDetailsExpanded" href="javascript:;" class="expand-rejection-details-link">
+                        <mat-icon *ngIf="!rejectionDetailsExpanded">expand_more</mat-icon>
+                        <mat-icon *ngIf="rejectionDetailsExpanded">expand_less</mat-icon>
+                      </a>
+                    </h1>
+                    <div class="py-4" fxLayout="row" *ngIf="rejectionDetailsExpanded">
+                      <div fxFlex>
+                        <div>
+                          <span class="rejection-reason"> Last Rejection Reason
+                            <span> {{currentMessage.national_id.rejection_reason}} </span>
+                          </span>
+                          <span class="submission-date"> PENDING {{currentMessage.national_id.submission_date | dateFormatter: true}}</span>
+                        </div>
+                        <div class="rejection-comment">
+                          <mat-icon>info</mat-icon>
+                          <span>{{currentMessage.national_id.rejection_comment}}</span>
+
+                          <span class="rejection-date"> REJECTED {{currentMessage.national_id.rejection_date | dateFormatter: true}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- last national ID details section-->
+                  <h1 class="title" *ngIf="currentMessage.national_id.message_status == 5">New Details</h1>
+                  <div>
+                    <span class="field-horizontal-label">National ID Number</span>
+                    <input readonly matInput [value]="currentMessage.national_id.national_number || ''" class="field-horizontal-value">
+                    <span class="submission-message-date" *ngIf="[1,3].indexOf(currentMessage.national_id.message_status) > -1">PENDING: {{currentMessage.national_id.submission_date | dateFormatter: true}}</span>
+                    <span class="submission-message-date" *ngIf="currentMessage.national_id.message_status == 5">Re-PENDING: {{currentMessage.national_id.re_submission_date | dateFormatter: true}}</span>
+                    <span class="submission-message-date" *ngIf="currentMessage.national_id.message_status == 2">Delivered: {{currentMessage.national_id.message_date | dateFormatter: true}}</span>
+
+                  </div>
+                  <div class="national-id-images">
+                    <img-thumbnail [src]="currentMessage.national_id.front_image?.url"></img-thumbnail>
+                    <img-thumbnail [src]="currentMessage.national_id.back_image?.url"></img-thumbnail>
+                    <img-thumbnail [src]="currentMessage.national_id.selfie_image?.url"></img-thumbnail>
+                  </div>
+                </div>
+                <div class="py-4 actions-buttons" fxLayout="row-reverse">
+                  <button class="reject-deliver-button" mat-raised-button color="warn" *ngIf="[1,5].indexOf(currentMessage.national_id.message_status) > -1"
+                    (click)="openRejectDialog()">
+                    Reject Message
+                  </button>
+                  <button class="reject-deliver-button" mat-raised-button color="accent" *ngIf="[1,3,5].indexOf(currentMessage.national_id.message_status) > -1"
+                    (click)="openDeliverDialog()">
+                    Deliver Message
+                  </button>
+                </div>
+              </mat-tab>
+              <mat-tab label="Payout Details" *ngIf="currentMessage.payout">
+                <div class="tab-content payout-tab" fusePerfectScrollbar fxLayout="column">
+                  <mat-radio-group onclick="return false;" [(ngModel)]="currentMessage.payout.type">
+                    <mat-radio-button value="0">Bank Account</mat-radio-button>
+                    <mat-radio-button value="1">Fawry Cash-out</mat-radio-button>
+                  </mat-radio-group>
+                  <div *ngIf="currentMessage.payout.type == 0" class="bank-account-details">
+                    <div>
+                      <span class="field-horizontal-label">Bank Name</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.bank_name || ''" class="field-horizontal-value">
+                    </div>
+                    <div>
+                      <span class="field-horizontal-label">Country</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.country || ''" class="field-horizontal-value">
+                    </div>
+                    <div>
+                      <span class="field-horizontal-label">Bank Address</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.bank_address || ''" class="field-horizontal-value">
+                    </div>
+                    <div>
+                      <span class="field-horizontal-label">Swift Code</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.swift_code || ''" class="field-horizontal-value">
+                    </div>
+                    <div>
+                      <span class="field-horizontal-label">Full Name</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.full_name || ''" class="field-horizontal-value">
+                    </div>
+                    <div>
+                      <span class="field-horizontal-label">Account Number</span>
+                      <input readonly matInput [value]="currentMessage.payout.bank_account.account_number || ''" class="field-horizontal-value">
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+          <div *ngIf="currentMessage.status == 2" class="message-activities-tab-group-container">
+            <mat-tab-group (selectedTabChange)="loadActivities($event)">
+              <mat-tab label="Listed Cars" id="carsTab">
+                <div fusePerfectScrollbar fxLayout="column">
+                  <mat-table #carsTable [dataSource]="vehiclesDataSource" [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
+
+                    <!-- Car Column -->
+                    <ng-container cdkColumnDef="car">
+                      <mat-header-cell *cdkHeaderCellDef>Car</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>{{vehicle.make?.name +' '+vehicle.model?.name +' '+ vehicle.manufacture_year}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Rating Column -->
+                    <ng-container cdkColumnDef="rating">
+                      <mat-header-cell *cdkHeaderCellDef>Rating</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <rating-item [value]="vehicle.profile?.average_rating"></rating-item>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Cars Column -->
+                    <ng-container cdkColumnDef="publishing_status">
+                      <mat-header-cell *cdkHeaderCellDef>Status</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>{{vehicle.is_published?"Published": "Un-published"}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Adding Date Column -->
+                    <ng-container cdkColumnDef="adding_date">
+                      <mat-header-cell *cdkHeaderCellDef>Adding Date</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>
+                          {{vehicle.adding_date| dateFormatter}}
+                        </p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Requests count Column -->
+                    <ng-container cdkColumnDef="requests">
+                      <mat-header-cell *cdkHeaderCellDef>Requests</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>{{vehicle.profile?.bookings_count == null ? '-': vehicle.profile?.bookings_count}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Trips count Column -->
+                    <ng-container cdkColumnDef="trips">
+                      <mat-header-cell *cdkHeaderCellDef>Trips</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>{{vehicle.profile?.trips_count == null ? '-': vehicle.profile?.trips_count}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Reviews count Column -->
+                    <ng-container cdkColumnDef="reviews">
+                      <mat-header-cell *cdkHeaderCellDef>Reviews</mat-header-cell>
+                      <mat-cell *cdkCellDef="let vehicle">
+                        <p>{{vehicle.profile?.reviews_count == null ? '-': vehicle.profile?.reviews_count}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *cdkHeaderRowDef="vehiclesDisplayedColumns" class="mat-accent-bg"></mat-header-row>
+
+                    <mat-row *cdkRowDef="let vehicle; columns: vehiclesDisplayedColumns;" matRipple [routerLink]="'/app/car-details/'+vehicle.vehicle_code">
+                    </mat-row>
+
+                  </mat-table>
+
+                </div>
+              </mat-tab>
+              <mat-tab label="Trips">
+                <div fusePerfectScrollbar fxLayout="column">
+                  <mat-table #tripsTable [dataSource]="tripsDataSource" matSort (matSortChange)="sortTripsData($event)" [@animateStagger]="{value:'50'}"
+                    fusePerfectScrollbar>
+
+                    <!-- Start Column -->
+                    <ng-container cdkColumnDef="start">
+                      <mat-header-cell *cdkHeaderCellDef mat-sort-header="StartDate">Start</mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>{{trip.trip_from | dateFormatter }}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- End Column -->
+                    <ng-container cdkColumnDef="end">
+                      <mat-header-cell *cdkHeaderCellDef mat-sort-header="EndDate">End</mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>{{trip.trip_to | dateFormatter }}></p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- status Column -->
+                    <ng-container cdkColumnDef="status">
+                      <mat-header-cell *cdkHeaderCellDef>
+                        <p class="m-0" *ngIf="tripsCriteriaFilter.trip_status">Status</p>
+                        <mat-select placeholder="Status" class="fullWidth" [(value)]="tripsCriteriaFilter.trip_status" (selectionChange)="searchTrips()">
+                          <mat-option *ngIf="tripsCriteriaFilter.trip_status !=null">Clear
+                            <mat-icon>close</mat-icon>
+                          </mat-option>
+                          <mat-option *ngFor="let status of staticLookups.TripStatusesList;" [value]="status.value">
+                            {{status.text}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p class="text-truncate">
+                          {{staticLookups.TripStatusesEnum[trip.trip_status]}}
+                        </p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Car Column -->
+                    <ng-container cdkColumnDef="car">
+                      <mat-header-cell *cdkHeaderCellDef>
+                        <p class="m-0" *ngIf="tripsCriteriaFilter.vehicle_codes">Car</p>
+                        <mat-select placeholder="Car" class="fullWidth" [(value)]="tripsCriteriaFilter.vehicle_codes"  (selectionChange)="searchTrips()">
+                          <mat-option *ngIf="tripsCriteriaFilter.vehicle_codes !=null">Clear
+                            <mat-icon>close</mat-icon>
+                          </mat-option>
+                          <mat-option *ngFor="let vehicle of vehiclesList;" [value]="vehicle.vehicle_code">
+                            {{vehicle.make?.name +' '+vehicle.model?.name +' '+ vehicle.manufacture_year}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>{{trip.vehicle_make_name +' '+trip.vehicle_model_name +' '+ trip.vehicle_manufacture_year}}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Driver Column -->
+                    <ng-container cdkColumnDef="driver">
+                      <mat-header-cell *cdkHeaderCellDef>Driver</mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>
+                          {{trip.driver_name}}
+                        </p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Total Revenue Column -->
+                    <ng-container cdkColumnDef="total_revenue">
+                      <mat-header-cell *cdkHeaderCellDef>Total Revenue</mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>
+                          {{trip.total_revenue}}
+                        </p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <!-- Confirmation Date Column -->
+                    <ng-container cdkColumnDef="confirmation_date">
+                      <mat-header-cell *cdkHeaderCellDef mat-sort-header="ConfirmationDate">Confirmation Date</mat-header-cell>
+                      <mat-cell *cdkCellDef="let trip">
+                        <p>{{trip.confirmation_date | dateFormatter }}</p>
+                      </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *cdkHeaderRowDef="tripsDisplayedColumns" class="mat-accent-bg"></mat-header-row>
+
+                    <mat-row *cdkRowDef="let trip; columns: tripsDisplayedColumns;" matRipple [routerLink]="'/app/trip-details/'+trip.trip_code">
+                    </mat-row>
+                  </mat-table>
+                  <mat-paginator #paginator [length]="tripsSearchResult.length" [pageIndex]="tripsCriteriaFilter.offset"
+                    [pageSize]="tripsCriteriaFilter.limit" [pageSizeOptions]="[5, 10, 25, 100]" (page)="tripsPaginationChanged($event)">
+                  </mat-paginator>
+                </div>
+              </mat-tab>
+              <mat-tab label="Requests">
+                <mat-table #bookingsTable [dataSource]="bookingsDataSource" matSort (matSortChange)="sortBookingsData($event)" [@animateStagger]="{value:'50'}"
+                  fusePerfectScrollbar>
+                  <!-- Start Column -->
+                  <ng-container cdkColumnDef="start">
+                    <mat-header-cell *cdkHeaderCellDef mat-sort-header="StartDate">Start</mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>{{booking.book_from | dateFormatter }}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- End Column -->
+                  <ng-container cdkColumnDef="end">
+                    <mat-header-cell *cdkHeaderCellDef mat-sort-header="EndDate">End</mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>{{booking.book_to | dateFormatter }}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- status Column -->
+                  <ng-container cdkColumnDef="status">
+                    <mat-header-cell *cdkHeaderCellDef>
+                      <p class="m-0" *ngIf="bookingsCriteriaFilter.booking_status">Status</p>
+                      <mat-select placeholder="Status" class="fullWidth" [(value)]="bookingsCriteriaFilter.booking_status" (selectionChange)="searchBookings()">
+                        <mat-option *ngIf="bookingsCriteriaFilter.booking_status">Clear
+                          <mat-icon>close</mat-icon>
+                        </mat-option>
+                        <mat-option *ngFor="let status of staticLookups.BookingStatusesList;" [value]="status.value">
+                          {{status.text}}
+                        </mat-option>
+                      </mat-select>
+                    </mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p class="text-truncate">
+                        {{staticLookups.BookingStatusesEnum[booking.booking_status]}}
+                      </p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Car Column -->
+                  <ng-container cdkColumnDef="car">
+                      <mat-header-cell *cdkHeaderCellDef>
+                        <p class="m-0" *ngIf="bookingsCriteriaFilter.vehicle_codes">Car</p>
+                        <mat-select placeholder="Car" class="fullWidth" [(value)]="bookingsCriteriaFilter.vehicle_codes"  (selectionChange)="searchBookings()">
+                          <mat-option *ngIf="bookingsCriteriaFilter.vehicle_codes !=null">Clear
+                            <mat-icon>close</mat-icon>
+                          </mat-option>
+                          <mat-option *ngFor="let vehicle of vehiclesList;" [value]="vehicle.vehicle_code">
+                            {{vehicle.make?.name +' '+vehicle.model?.name +' '+ vehicle.manufacture_year}}
+                          </mat-option>
+                        </mat-select>
+                      </mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>{{booking.vehicle_make_name +' '+booking.vehicle_model_name +' '+ booking.vehicle_manufacture_year}}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Driver Column -->
+                  <ng-container cdkColumnDef="driver">
+                    <mat-header-cell *cdkHeaderCellDef>Driver</mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>
+                        {{booking.driver_name}}
+                      </p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Expected Revenue Column -->
+                  <ng-container cdkColumnDef="expected_revenue">
+                    <mat-header-cell *cdkHeaderCellDef>Expected Revenue</mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>
+                        {{booking.expected_revenue}}
+                      </p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <!-- Booking Date Column -->
+                  <ng-container cdkColumnDef="booking_date">
+                    <mat-header-cell *cdkHeaderCellDef mat-sort-header="BookingDate">Booking Date</mat-header-cell>
+                    <mat-cell *cdkCellDef="let booking">
+                      <p>{{booking.booking_date | dateFormatter }}</p>
+                    </mat-cell>
+                  </ng-container>
+
+                  <mat-header-row *cdkHeaderRowDef="bookingsDisplayedColumns" class="mat-accent-bg"></mat-header-row>
+
+                  <mat-row *cdkRowDef="let booking; columns: bookingsDisplayedColumns;" matRipple [routerLink]="'/app/booking-details/'+booking.booking_code">
+                  </mat-row>
+
+                </mat-table>
+                <mat-paginator #paginator [length]="bookingsSearchResult.length" [pageIndex]="bookingsCriteriaFilter.offset"
+                  [pageSize]="bookingsCriteriaFilter.limit" [pageSizeOptions]="[5, 10, 25, 100]" (page)="bookingsPaginationChanged($event)">
+                </mat-paginator>
+              </mat-tab>
+              <mat-tab label="Payments">
+                <div fusePerfectScrollbar fxLayout="column">
+                  Payments
+                </div>
+              </mat-tab>
+              <mat-tab label="Complaints">
+                <div fusePerfectScrollbar fxLayout="column">
+                  Complaints
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+
+      <ng-template #rejectDialogTemplate>
+        <div class="reject-dialog">
+          <mat-dialog-content>
+            <div>
+              <div class="label">Reason of rejection</div>
+              <mat-select placeholder="Select Reason" class="fullWidth" [(value)]="rejection_reason_code" name="rejection_reason_code">
+                <mat-option *ngIf="rejection_reason_code">Clear
+                  <mat-icon>close</mat-icon>
+                </mat-option>
+                <mat-option *ngFor="let user of users;" [value]="user.code">
+                  {{user.reason}}
+                </mat-option>
+              </mat-select>
+            </div>
+            <div class="label">Comment(optional)</div>
+            <textarea rows="3" matInput placeholder="reject reason" [(ngModel)]="rejection_comment"></textarea>
+          </mat-dialog-content>
+          <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+            <button mat-raised-button [mat-dialog-close]="true" color="warn" [disabled]="!rejection_reason_code">Reject Message</button>
+            <button mat-raised-button mat-dialog-close>Cancel</button>
+          </mat-dialog-actions>
+        </div>
+      </ng-template>
+
+      <ng-template #deliverDialogTemplate>
+        <div class="deliver-dialog">
+          <mat-dialog-content>
+            <div class="label">Are you sure to deliver message national ID ?</div>
+          </mat-dialog-content>
+          <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+            <button mat-raised-button [mat-dialog-close]="true" color="accent">Deliver National ID</button>
+            <button mat-raised-button mat-dialog-close>Cancel</button>
+          </mat-dialog-actions>
+        </div>
+      </ng-template>
+
+
+      <ng-template #suspendDialogTemplate>
+        <div class="suspend-dialog">
+          <h2 mat-dialog-title class="title">Reason of Suspension</h2>
+          <div class="sub-title">Min 50 characters</div>
+          <mat-dialog-content>
+            <textarea rows="5" matInput placeholder="suspend reason" [(ngModel)]="suspension_reason"></textarea>
+          </mat-dialog-content>
+          <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+            <button mat-raised-button [mat-dialog-close]="true" color="warn" [disabled]="!suspension_reason">Suspend Account</button>
+            <button mat-raised-button mat-dialog-close>Cancel</button>
+          </mat-dialog-actions>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

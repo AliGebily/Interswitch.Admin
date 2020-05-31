@@ -1,0 +1,405 @@
+<div class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div
+      class="header"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <!-- APP TITLE -->
+      <div
+        class="logo my-12 m-sm-0 white-fg"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >account_circle</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >{{ pageTitle }}</span
+        >
+      </div>
+      <!-- / APP TITLE -->
+      <!-- SEARCH -->
+      <div
+        class="search-input-wrapper"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-accordion floatPlaceholder="never" fxFlex="1 0 auto">
+          <mat-expansion-panel hideToggle="true" #searchPanel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Search </mat-panel-title>
+              <mat-panel-description>
+                Search by message receiver, and text.
+              </mat-panel-description>
+              <mat-icon>search</mat-icon>
+            </mat-expansion-panel-header>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="To"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.filterId"
+                >
+                  <mat-option *ngIf="criteriaFilter.filterId"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let filter of notificationFilterTypes"
+                    [value]="filter.id"
+                  >
+                    {{ filter.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Team -->
+              <mat-form-field fxFlex *ngIf="criteriaFilter.filterId == 1">
+                <mat-select
+                  placeholder="Select Team"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.filterName"
+                  name="team"
+                >
+                  <mat-option *ngIf="criteriaFilter.filterName"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let team of teams"
+                    [value]="team.filterName"
+                  >
+                    {{ team.filterName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Region -->
+              <mat-form-field fxFlex *ngIf="criteriaFilter.filterId == 2">
+                <mat-select
+                  placeholder="Select Region"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.filterName"
+                  name="region"
+                >
+                  <mat-option *ngIf="criteriaFilter.filterName"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let region of regions"
+                    [value]="region.filterName"
+                  >
+                    {{ region.filterName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- User -->
+              <mat-form-field fxFlex *ngIf="criteriaFilter.filterId == 5">
+                <mat-select
+                  placeholder="Select User"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.filterName"
+                  name="userId"
+                >
+                  <mat-option *ngIf="criteriaFilter.filterName"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let user of users"
+                    [value]="user.id"
+                  >
+                    {{ user | userDisplayNameFormatter }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <input
+                  matInput
+                  placeholder="Message"
+                  [(ngModel)]="criteriaFilter.body"
+                />
+                <button
+                  mat-button
+                  *ngIf="criteriaFilter.body"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="Clear"
+                  (click)="criteriaFilter.body = null"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row"></div>
+            <div class="py-0" fxLayout="row-reverse">
+              <mat-card-actions>
+                <button mat-raised-button (click)="clearCriteriaFilter()">
+                  <mat-icon>close</mat-icon>Clear
+                </button>
+                <button mat-raised-button color="accent" (click)="search(true)">
+                  <mat-icon style="color:white">search</mat-icon>Search
+                </button>
+              </mat-card-actions>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <!-- / SEARCH -->
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+    <div>
+      <!-- SEND -->
+      <button
+        class="floated-right m-12 ml-0 w-160"
+        mat-raised-button
+        color="primary"
+        (click)="openSendMessageDialog()"
+      >
+        <mat-icon>send</mat-icon> Send Message
+      </button>
+      <!-- / SEND -->
+    </div>
+    <div
+      class="empty-data content-card mat-white-bg"
+      *ngIf="messagesSearchResult.notifications.length == 0"
+    >
+      The search filter did not match any results.
+    </div>
+
+    <div
+      class="content-card mat-white-bg"
+      *ngIf="messagesSearchResult.notifications.length > 0"
+    >
+      <mat-table
+        #table
+        [dataSource]="messagesDataSource"
+        matSort
+        (matSortChange)="sortData($event)"
+        [@animateStagger]="{ value: '50' }"
+        fusePerfectScrollbar
+      >
+        <!-- To Column -->
+        <ng-container cdkColumnDef="title">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="FilterName"
+            >To</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.title }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Body Column -->
+        <ng-container cdkColumnDef="body">
+          <mat-header-cell *cdkHeaderCellDef>body</mat-header-cell>
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.body }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Message Date Column -->
+        <ng-container cdkColumnDef="date">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="CreatedAt"
+            >Sent At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.date | dateFormatter }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container cdkColumnDef="actions">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let message">
+            <button mat-icon-button (click)="openDeleteMessageDialog(message)">
+              <mat-icon aria-label="Delete message">delete_forever</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *cdkHeaderRowDef="displayedColumns"
+          class="mat-accent-bg"
+        ></mat-header-row>
+        <!-- [routerLink]="'/app/message-details/'+message.id" -->
+        <mat-row
+          title="click row to view full details of message"
+          *cdkRowDef="let message; columns: displayedColumns"
+          matRipple
+          (click)="viewMessage(message)"
+          [class.message-pending]="message.status == 'PENDING'"
+          [class.message-rejected]="message.status == 'REJECTED'"
+          [class.mat-row-selected]="selectedMessage == message"
+        >
+        </mat-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="messagesSearchResult.metadata.totalCount"
+        [pageIndex]="criteriaFilter.page_index"
+        [pageSize]="criteriaFilter.limit"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="PaginationChanged($event)"
+      >
+      </mat-paginator>
+    </div>
+
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+
+  <ng-template #viewMessageDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Message Details</div>
+      <mat-dialog-content>
+        <div class="label">{{ selectedMessage.body }}</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #deleteMessageDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Confirm Deleting Message</div>
+      <mat-dialog-content>
+        <div class="label">Are you sure to delete selected message ?</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button [mat-dialog-close]="true" color="warn">
+          Delete
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #sendMessageDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Send Message</div>
+      <mat-dialog-content>
+        <div class="m-4" fxLayout="row">
+          <mat-form-field fxFlex>
+            <mat-select
+              placeholder="To"
+              class="fullWidth"
+              [(value)]="selectedMessage.filterID"
+            >
+              <mat-option *ngIf="selectedMessage.filterID"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option
+                *ngFor="let filter of notificationFilterTypes"
+                [value]="filter.id"
+              >
+                {{ filter.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Team -->
+          <mat-form-field fxFlex *ngIf="selectedMessage.filterID == 1">
+            <mat-select
+              placeholder="Select Team"
+              class="fullWidth"
+              [(value)]="selectedMessage.filterValue"
+              name="team"
+            >
+              <mat-option *ngIf="selectedMessage.filterValue"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option *ngFor="let team of teams" [value]="team.filterName">
+                {{ team.filterName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Region -->
+          <mat-form-field fxFlex *ngIf="selectedMessage.filterID == 2">
+            <mat-select
+              placeholder="Select Region"
+              class="fullWidth"
+              [(value)]="selectedMessage.filterValue"
+              name="region"
+            >
+              <mat-option *ngIf="selectedMessage.filterValue"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option
+                *ngFor="let region of regions"
+                [value]="region.filterName"
+              >
+                {{ region.filterName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- User -->
+          <mat-form-field fxFlex *ngIf="selectedMessage.filterID == 5">
+            <mat-select
+              placeholder="Select User"
+              class="fullWidth"
+              [(value)]="selectedMessage.filterValue"
+              name="userId"
+            >
+              <mat-option *ngIf="selectedMessage.filterValue"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option *ngFor="let user of users" [value]="user.id">
+                {{ user | userDisplayNameFormatter }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="m-4" fxLayout="row">
+          <textarea
+            class="bordered"
+            rows="3"
+            matInput
+            placeholder="Message"
+            [(ngModel)]="selectedMessage.body"
+          ></textarea>
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button
+          mat-raised-button
+          [mat-dialog-close]="true"
+          color="accent"
+          [disabled]="!selectedMessage.body || !selectedMessage.filterID"
+        >
+          Send
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+</div>

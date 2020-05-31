@@ -1,0 +1,13 @@
+<p *ngIf="value != null">
+    <mat-icon class="rating">{{ value > 0.33 ? (value > .66 ? 'star': 'star_half' ) : 'star_border' }}
+    </mat-icon>
+    <mat-icon class="rating">{{ value > 1.33 ? (value > 1.66 ? 'star': 'star_half' ) : 'star_border' }}
+    </mat-icon>
+    <mat-icon class="rating">{{ value > 2.33 ? (value > 2.66 ? 'star': 'star_half' ) : 'star_border' }}
+    </mat-icon>
+    <mat-icon class="rating">{{ value > 3.33 ? (value > 3.66 ? 'star': 'star_half' ) : 'star_border' }}
+    </mat-icon>
+    <mat-icon class="rating">{{ value > 4.33 ? (value > 4.66 ? 'star': 'star_half' ) : 'star_border' }}
+    </mat-icon>
+</p>
+<p *ngIf="value == null">_____</p>

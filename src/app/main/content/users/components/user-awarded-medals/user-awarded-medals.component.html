@@ -1,0 +1,339 @@
+<div class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div
+      class="header"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <!-- APP TITLE -->
+      <div
+        class="logo my-12 m-sm-0 white-fg"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >account_circle</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >{{ pageTitle }}</span
+        >
+      </div>
+      <!-- / APP TITLE -->
+      <!-- SEARCH -->
+      <div
+        class="search-input-wrapper"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-accordion floatPlaceholder="never" fxFlex="1 0 auto">
+          <mat-expansion-panel hideToggle="true" #searchPanel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Search </mat-panel-title>
+              <mat-panel-description>
+                Search by medal, and user.
+              </mat-panel-description>
+              <mat-icon>search</mat-icon>
+            </mat-expansion-panel-header>
+            <div class="py-0" fxLayout="row">
+              <!-- User -->
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="Select User"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.username"
+                  name="username"
+                >
+                  <mat-option *ngIf="criteriaFilter.username"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let user of users"
+                    [value]="user.username"
+                  >
+                    {{ user | userDisplayNameFormatter }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <!-- User -->
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="Select Medal"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.medalId"
+                  name="medalId"
+                >
+                  <mat-option *ngIf="criteriaFilter.medalId"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option *ngFor="let medal of goldenMedals" [value]="medal.id">
+                    {{ medal.title }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="py-0" fxLayout="row"></div>
+            <div class="py-0" fxLayout="row-reverse">
+              <mat-card-actions>
+                <button mat-raised-button (click)="clearCriteriaFilter()">
+                  <mat-icon>close</mat-icon>Clear
+                </button>
+                <button mat-raised-button color="accent" (click)="search(true)">
+                  <mat-icon style="color:white">search</mat-icon>Search
+                </button>
+              </mat-card-actions>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <!-- / SEARCH -->
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+
+    <!-- Award -->
+    <div>
+      <button
+        class="floated-right m-12 ml-0 w-200"
+        mat-raised-button
+        color="primary"
+        (click)="openAwardUserMedalDialog()"
+      >
+        <mat-icon>star_rate</mat-icon> Give User A Medal
+      </button>
+    </div>
+    <!-- / Award -->
+    <div
+      class="empty-data content-card mat-white-bg"
+      *ngIf="userAwardedMedalsSearchResult.userAwardedMedals.length == 0"
+    >
+      The search filter did not match any results.
+    </div>
+
+    <div
+      class="content-card mat-white-bg"
+      *ngIf="userAwardedMedalsSearchResult.userAwardedMedals.length > 0"
+    >
+      <mat-table
+        #table
+        [dataSource]="userAwardedMedalsDataSource"
+        matSort
+        (matSortChange)="sortData($event)"
+        [@animateStagger]="{ value: '50' }"
+        fusePerfectScrollbar
+      >
+        <!-- User Column -->
+        <ng-container cdkColumnDef="userTitle">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="username"
+            >User</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let userAwardedMedal">
+            <p class="text-truncate">
+              {{ userAwardedMedal.userTitle || userAwardedMedal.username }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Medal Column -->
+        <ng-container cdkColumnDef="medalTitle">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="Medal.Title"
+            >Medal</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let userAwardedMedal">
+            <p class="text-truncate">{{ userAwardedMedal.medalTitle }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- UserAwardedMedal Date Column -->
+        <ng-container cdkColumnDef="awardedAt">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="awardedAt"
+            >Awarded At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let userAwardedMedal">
+            <p class="text-truncate">
+              {{ userAwardedMedal.awardedAt | dateFormatter }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container cdkColumnDef="description">
+          <mat-header-cell *cdkHeaderCellDef>Description</mat-header-cell>
+          <mat-cell *cdkCellDef="let userAwardedMedal">
+            <p class="text-truncate">{{ userAwardedMedal.description }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container cdkColumnDef="actions">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let userAwardedMedal">
+            <button
+              mat-icon-button
+              (click)="openDeleteUserAwardedMedalDialog(userAwardedMedal)"
+              *ngIf="userAwardedMedal.awardedBy"
+            >
+              <mat-icon aria-label="Delete userAwardedMedal"
+                >delete_forever</mat-icon
+              >
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *cdkHeaderRowDef="displayedColumns"
+          class="mat-accent-bg"
+        ></mat-header-row>
+        <!--
+          [routerLink]="'/app/userAwardedMedal-details/'+userAwardedMedal.id"
+        -->
+        <mat-row
+          title="click row to view full details of userAwardedMedal"
+          *cdkRowDef="let userAwardedMedal; columns: displayedColumns"
+          matRipple
+          (click)="viewUserAwardedMedal(userAwardedMedal)"
+          [class.mat-row-selected]="
+            selectedUserAwardedMedal == userAwardedMedal
+          "
+        >
+        </mat-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="userAwardedMedalsSearchResult.metadata.totalCount"
+        [pageIndex]="criteriaFilter.page_index"
+        [pageSize]="criteriaFilter.limit"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="PaginationChanged($event)"
+      >
+      </mat-paginator>
+    </div>
+
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+
+  <ng-template #viewUserAwardedMedalDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Medal Details</div>
+      <mat-dialog-content>
+        <div class="label">{{ selectedUserAwardedMedal.description }}</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #deleteUserAwardedMedalDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Confirm Deleting</div>
+      <mat-dialog-content>
+        <div class="label">
+          Are you sure to delete selected userAwardedMedal ?
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button [mat-dialog-close]="true" color="warn">
+          Delete
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #awardUserMedalDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Award Medal</div>
+      <mat-dialog-content>
+        <div class="m-4" fxLayout="row">
+          <!-- User -->
+          <mat-form-field fxFlex>
+            <mat-select
+              placeholder="Select User"
+              class="fullWidth"
+              [(value)]="selectedUserAwardedMedal.username"
+              name="username"
+            >
+              <mat-option
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option *ngFor="let user of users" [value]="user.username">
+                {{ user | userDisplayNameFormatter }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="m-4" fxLayout="row">
+          <!-- Medal -->
+          <mat-form-field fxFlex>
+            <mat-select
+              placeholder="Select Medal"
+              class="fullWidth"
+              [(value)]="selectedUserAwardedMedal.medalId"
+              name="medalId"
+            >
+              <!-- <mat-option *ngIf="selectedUserAwardedMedal.medalId"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option> -->
+              <mat-option *ngFor="let medal of eligibleManuallyAwardedMedals" [value]="medal.id">
+                {{ medal.title }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div
+          class="m-4"
+          fxLayout="row"
+          *ngIf="selectedUserAwardedMedal?.medalId == 8 || selectedUserAwardedMedal?.medalId == 20"
+        >
+          <textarea
+            class="bordered"
+            rows="3"
+            matInput
+            placeholder="Description"
+            [(ngModel)]="selectedUserAwardedMedal.description"
+          ></textarea>
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button
+          mat-raised-button
+          [mat-dialog-close]="true"
+          color="accent"
+          [disabled]="
+          (!selectedUserAwardedMedal.description && (selectedUserAwardedMedal?.medalId == 8 || selectedUserAwardedMedal?.medalId == 20)) ||
+            !selectedUserAwardedMedal.username ||
+            !selectedUserAwardedMedal.medalId
+          "
+        >
+          Award
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,244 @@
+// Import Fuse main library
+@import '@fuse/scss/core';
+.mat-progress-spinner circle,
+.mat-spinner circle {
+  stroke: #00405c;
+}
+.mat-input-element{
+caret-color: initial;
+}
+
+// .mat-raised-button.mat-accent,
+// .mat-fab.mat-accent,
+// .mat-mini-fab.mat-accent,
+// .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+// .mat-checkbox-checked.mat-accent .mat-checkbox-background {
+//   background-color: #00405c;
+// }
+// .mat-simple-snackbar-action {
+//   color: #00405c;
+// }
+
+// .mat-main-bg{
+// // .mat-accent-bg {
+//   background-color: #00405c !important;
+//   color: white !important;
+// }
+.mat-header-cell {
+  color: rgba(255, 255, 255, 1);
+}
+.mat-accent-bg {
+  background-color: #00405c !important;
+  color: white !important;
+}
+
+.mat-dialog-container {
+  padding: 0px !important;
+  margin: 0px !important;
+  .dialog-header{
+    font-weight: bold;
+    line-height: 30px;
+    margin-bottom: 5px; 
+    padding: 5px;
+  }
+  .mat-dialog-content{
+    padding: 5px;
+    margin: 0px
+  }
+  .mat-dialog-actions{
+    margin: 2px;
+    button{
+      margin: 2px;
+    }
+  }
+}
+
+.error-message {
+  color: red;
+  background: white;
+  border-radius: 4px;
+  border: solid 1px black;
+  margin-top: 10px;
+}
+.success-message {
+  color: green;
+  background: white;
+  border-radius: 4px;
+  border: solid 1px black;
+  margin-top: 10px;
+}
+.empty-data {
+  text-align: center;
+  padding-top: 20%;
+  font-size: 2rem;
+}
+.mat-snack-bar-container {
+  padding: 10px !important;
+}
+// handle long message in snackbar
+.mat-simple-snackbar {
+  overflow: scroll;
+}
+
+// fix for sorting arrow in table header when switching between tabs
+.mat-sort-header-arrow {
+  opacity: 0;
+}
+.mat-sort-header-pointer-left {
+  transform: rotate(-45deg);
+}
+.mat-sort-header-pointer-right {
+  transform: rotate(45deg);
+}
+.mat-sort-header-button {
+  text-align: left;
+}
+
+// page header and search panel
+.header {
+  position: relative;
+  .search-input-wrapper {
+    mat-accordion {
+      margin-top: 50px;
+      position: absolute;
+      top: 0px;
+      right: 10px;
+      z-index: 2;
+      min-width: 460px !important;
+      max-width: 500px !important;
+    }
+  }
+}
+
+// tabs
+.mat-tab-group {
+  .mat-tab-nav-bar,
+  .mat-tab-header {
+    border-bottom: 1px solid black;
+    .mat-tab-label {
+      background-color: rgba(197, 198, 203, 0.3);
+    }
+    .mat-tab-list {
+      .mat-tab-label-active {
+        font-weight: bold;
+        color: black;
+        opacity: 1;
+      }
+      .mat-ink-bar {
+        display: none;
+      }
+    }
+  }
+  .mat-tab-body-wrapper {
+    padding-top: 10px;
+  }
+}
+
+// custom classes
+.bordered {
+  border: solid 1px !important;
+}
+.bordered-left {
+  border-left: solid 1px !important;
+}
+.bordered-right {
+  border-right: solid 1px !important;
+}
+.bordered-top {
+  border-top: solid 1px !important;
+}
+.bordered-bottom {
+  border-bottom: solid 1px !important;
+}
+.floated-left {
+  float: left;
+}
+.floated-right {
+  float: right;
+}
+.clearfix {
+  overflow: auto;
+}
+.clearfix::after {
+  content: '';
+  clear: both;
+  display: table;
+}
+.field-vertical-label {
+  border-bottom: solid 1px;
+  padding-bottom: 10px;
+  font-weight: bold;
+  margin: 10px 0px;
+  font-size: 1.2rem;
+}
+.field-vertical-value {
+  border: solid 1px;
+  width: auto;
+  padding: 5px 5px;
+  height: 30px;
+  margin-top: 10px;
+}
+.field-horizontal-label {
+  display: inline-block;
+  width: 150px;
+  font-weight: bold;
+  margin: 5px 0px;
+  font-size: 1.2rem;
+}
+.field-horizontal-value {
+  border: solid 1px;
+  width: 300px;
+  padding: 5px 5px;
+  margin: 2px 0px;
+  height: 30px;
+}
+
+.mat-row {
+  &:hover,
+  &:active,
+  &:focus {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+}
+.mat-row-selected {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.message-new,
+.message-pending {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.message-delivered {
+  background-color: rgba(0, 255, 0, 0.1);
+}
+.message-rejected {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+.reject-dialog,
+.verify-dialog,
+.cancel-dialog,
+.suspend-dialog {
+  .mat-dialog-title {
+    margin: 0px;
+  }
+  textarea {
+    margin-top: 10px;
+    width: 100%;
+    border: 1px solid;
+    padding: 5px;
+    font-size: 1.3rem;
+  }
+  button {
+    margin-left: 5px;
+  }
+  .mat-select {
+    border: solid 1px;
+    padding: 5px;
+    font-size: 1.3rem;
+  }
+  .label {
+    font-weight: bold;
+    margin: 5px 0px;
+    font-size: 1.2rem;
+  }
+}

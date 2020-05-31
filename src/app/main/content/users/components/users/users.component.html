@@ -1,0 +1,422 @@
+<div class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div
+      class="header"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <!-- APP TITLE -->
+      <div
+        class="logo my-12 m-sm-0 white-fg"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >account_circle</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >{{ pageTitle }}</span
+        >
+      </div>
+      <!-- / APP TITLE -->
+      <!-- SEARCH -->
+      <div
+        class="search-input-wrapper"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-accordion floatPlaceholder="never" fxFlex="1 0 auto">
+          <mat-expansion-panel hideToggle="true" #searchPanel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Search </mat-panel-title>
+              <mat-panel-description>
+                Search by name, region, and team.
+              </mat-panel-description>
+              <mat-icon>search</mat-icon>
+            </mat-expansion-panel-header>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <input
+                  matInput
+                  placeholder="Name"
+                  [(ngModel)]="criteriaFilter.name"
+                />
+                <button
+                  mat-button
+                  *ngIf="criteriaFilter.name"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="Clear"
+                  (click)="criteriaFilter.name = null"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <!-- User -->
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="Select Region"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.region"
+                  name="region"
+                >
+                  <mat-option *ngIf="criteriaFilter.region"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let region of regions"
+                    [value]="region.filterName"
+                  >
+                    {{ region.filterName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <!-- User -->
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="Select Team"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.team"
+                  name="team"
+                >
+                  <mat-option *ngIf="criteriaFilter.team"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let team of teams"
+                    [value]="team.filterName"
+                  >
+                    {{ team.filterName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="py-0" fxLayout="row"></div>
+            <div class="py-0" fxLayout="row-reverse">
+              <mat-card-actions>
+                <button mat-raised-button (click)="clearCriteriaFilter()">
+                  <mat-icon>close</mat-icon>Clear
+                </button>
+                <button mat-raised-button color="accent" (click)="search(true)">
+                  <mat-icon style="color:white">search</mat-icon>Search
+                </button>
+              </mat-card-actions>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <!-- / SEARCH -->
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+
+    <div
+      class="empty-data content-card mat-white-bg"
+      *ngIf="usersSearchResult.users.length == 0"
+    >
+      The search filter did not match any results.
+    </div>
+
+    <div
+      class="content-card mat-white-bg"
+      *ngIf="usersSearchResult.users.length > 0"
+    >
+    <mat-table
+    #table
+    [dataSource]="usersDataSource"
+    matSort
+    (matSortChange)="sortData($event)"
+    [@animateStagger]="{ value: '50' }"
+    fusePerfectScrollbar
+  >
+      <!-- Index Column -->
+    <ng-container matColumnDef="index">
+      <mat-header-cell *matHeaderCellDef> # </mat-header-cell>
+      <mat-cell *matCellDef="let element; let i = index;">{{i+1}}</mat-cell>
+    </ng-container>
+
+
+        <!-- Name Column -->
+        <ng-container cdkColumnDef="name">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="FirstName"
+            >Name</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.firstName + ' ' + user.lastName }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Region Column -->
+        <ng-container cdkColumnDef="region">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="Region"
+            >Region</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">{{ user.region }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Team Column -->
+        <ng-container cdkColumnDef="team">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="Team"
+            >Team</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">{{ user.team }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- CurrentQuarterTarget Column -->
+        <ng-container cdkColumnDef="quarterlyTargetCurrency">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentQuarterTarget"
+            >Quarter Target</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.quarterlyTargetCurrency }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- quarterlyAchievedCurrency Column -->
+        <ng-container cdkColumnDef="quarterlyAchievedCurrency">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentQuarterSales"
+            >Quarter Sales(N)</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.quarterlyAchievedCurrency }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- quarterlyAchievedPercent Column -->
+        <ng-container cdkColumnDef="quarterlyAchievedPercent">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentQuarterAchievedPercent"
+            >Quarter Sales(%)</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.quarterlyAchievedPercent }} %
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- CurrentYearTarget Column -->
+        <ng-container cdkColumnDef="yearlyTargetCurrency">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentYearTarget"
+            >Year Target</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.yearlyTargetCurrency }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- yearlyAchievedCurrency Column -->
+        <ng-container cdkColumnDef="yearlyAchievedCurrency">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentYearSales"
+            >Year Sales(N)</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.yearlyAchievedCurrency }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- yearlyAchievedPercent Column -->
+        <ng-container cdkColumnDef="yearlyAchievedPercent">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="UserCRMInfo.CurrentYearAchievedPercent"
+            >Year Sales(%)</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <p class="text-truncate">
+              {{ user.userData?.yearlyAchievedPercent }} %
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <!--
+          <ng-container cdkColumnDef="actions">
+            <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+            <mat-cell *cdkCellDef="let user">
+              <button
+                mat-icon-button
+                (click)="openDeleteUserDialog(user)"
+              >
+                <mat-icon aria-label="Delete user">delete_forever</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+        -->
+
+        <mat-header-row
+          *cdkHeaderRowDef="displayedColumns"
+          class="mat-accent-bg"
+        ></mat-header-row>
+        <!-- [routerLink]="'/app/user-details/'+user.id" -->
+        <mat-row
+          title="click row to view full details of user"
+          *cdkRowDef="let user; columns: displayedColumns"
+          matRipple
+          (click)="viewUser(user)"
+          [class.mat-row-selected]="selectedUser == user"
+        >
+        </mat-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="usersSearchResult.metadata.totalCount"
+        [pageIndex]="criteriaFilter.page_index"
+        [pageSize]="criteriaFilter.limit"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="PaginationChanged($event)"
+      >
+      </mat-paginator>
+    </div>
+
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+
+  <ng-template #viewUserDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">User Details</div>
+      <mat-dialog-content>
+        <div class="label">{{ selectedUser.description }}</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #deleteUserDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Confirm Deleting</div>
+      <mat-dialog-content>
+        <div class="label">Are you sure to delete selected user ?</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button [mat-dialog-close]="true" color="warn">
+          Delete
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #awardUserUserDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Award User</div>
+      <mat-dialog-content>
+        <div class="m-4" fxLayout="row">
+          <!-- User -->
+          <mat-form-field fxFlex>
+            <mat-select
+              placeholder="Select User"
+              class="fullWidth"
+              [(value)]="selectedUser.username"
+              name="username"
+            >
+              <mat-option
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option
+                *ngFor="let user of users"
+                [value]="user.profile.username"
+              >
+                {{ user.profile | userDisplayNameFormatter }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="m-4" fxLayout="row">
+          <!-- User -->
+          <mat-form-field fxFlex>
+            <mat-select
+              placeholder="Select User"
+              class="fullWidth"
+              [(value)]="selectedUser.userId"
+              name="userId"
+            >
+              <mat-option *ngIf="selectedUser.userId"
+                >Clear
+                <mat-icon>close</mat-icon>
+              </mat-option>
+              <mat-option *ngFor="let user of users" [value]="user.id">
+                {{ user.title }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="m-4" fxLayout="row">
+          <textarea
+            class="bordered"
+            rows="3"
+            matInput
+            placeholder="Description"
+            [(ngModel)]="selectedUser.description"
+          ></textarea>
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button
+          mat-raised-button
+          [mat-dialog-close]="true"
+          color="accent"
+          [disabled]="
+            !selectedUser.description ||
+            !selectedUser.username ||
+            !selectedUser.userId
+          "
+        >
+          Award
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+</div>

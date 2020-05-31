@@ -1,0 +1,21 @@
+@import 'src/@fuse/scss/fuse';
+
+:host {
+  .mat-column-medalTitle,
+  .mat-column-userTitle,
+  {
+    min-width: 120px;
+    max-width: 120px;
+  }
+  .mat-column-description {
+    margin-right: 20px;
+  } 
+  .mat-column-awardedAt {
+    min-width: 170px;
+    max-width: 170px;
+  }
+  .mat-column-actions {
+    min-width: 50px;
+    max-width: 50px;
+  }
+}

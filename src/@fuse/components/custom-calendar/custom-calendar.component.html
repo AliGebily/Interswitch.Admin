@@ -1,0 +1,31 @@
+<div class="month mat-accent-bg">
+    <ul>
+        <li class="prev">
+            <a class="white-fg" href="javascript:;" (click)="goPreviousMonth()"> &#10094;</a>
+        </li>
+        <li class="next">
+            <a class="white-fg" href="javascript:;" (click)="goNextMonth()"> &#10095;</a>
+        </li>
+        <li>
+            {{selectedMonth.monthName}}
+            <br>
+            <span style="font-size:18px">{{selectedMonth.year}}</span>
+        </li>
+    </ul>
+</div>
+
+<ul class="weekdays">
+    <li>Sun</li>
+    <li>Mon</li>
+    <li>Tue</li>
+    <li>Wed</li>
+    <li>Thur</li>
+    <li>Fri</li>
+    <li>Sat</li>
+</ul>
+
+<ul class="days">
+    <li *ngFor="let day of days;">
+        <span [ngClass]="{'active': day.isActive}">{{day.sequence}}</span>
+    </li>
+</ul>

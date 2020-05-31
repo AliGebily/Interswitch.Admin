@@ -1,0 +1,46 @@
+
+  .content-loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+.overlay-bg {
+  opacity: 0.2;
+  background-color: black;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  z-index: 99998;
+}
+.img-preview-container {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99999;
+  background: white;
+  -webkit-box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 4px;
+  max-height: 70%;
+  overflow: scroll;
+  img.preview {
+    height: auto !important;
+    width: auto !important;
+  }
+  a.close {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+  }
+}

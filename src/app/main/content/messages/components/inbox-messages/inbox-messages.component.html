@@ -1,0 +1,264 @@
+<div class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div
+      class="header"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <!-- APP TITLE -->
+      <div
+        class="logo my-12 m-sm-0 white-fg"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >account_circle</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >{{ pageTitle }}</span
+        >
+      </div>
+      <!-- / APP TITLE -->
+      <!-- SEARCH -->
+      <div
+        class="search-input-wrapper"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-accordion floatPlaceholder="never" fxFlex="1 0 auto">
+          <mat-expansion-panel hideToggle="true" #searchPanel>
+            <mat-expansion-panel-header>
+              <mat-panel-title> Search </mat-panel-title>
+              <mat-panel-description>
+                Search by message status, sender, and text.
+              </mat-panel-description>
+              <mat-icon>search</mat-icon>
+            </mat-expansion-panel-header>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="Status"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.status"
+                >
+                  <mat-option *ngIf="criteriaFilter.status"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let status of messageStatus"
+                    [value]="status"
+                  >
+                    {{ status }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <mat-select
+                  placeholder="From"
+                  class="fullWidth"
+                  [(value)]="criteriaFilter.userId"
+                  name="userId"
+                >
+                  <mat-option *ngIf="criteriaFilter.userId"
+                    >Clear
+                    <mat-icon>close</mat-icon>
+                  </mat-option>
+                  <mat-option
+                    *ngFor="let user of users"
+                    [value]="user.id"
+                  >
+                    {{ user | userDisplayNameFormatter }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row">
+              <mat-form-field fxFlex>
+                <input
+                  matInput
+                  placeholder="Message"
+                  [(ngModel)]="criteriaFilter.body"
+                />
+                <button
+                  mat-button
+                  *ngIf="criteriaFilter.body"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="Clear"
+                  (click)="criteriaFilter.body = null"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="py-0" fxLayout="row"></div>
+            <div class="py-0" fxLayout="row-reverse">
+              <mat-card-actions>
+                <button mat-raised-button (click)="clearCriteriaFilter()">
+                  <mat-icon>close</mat-icon>Clear
+                </button>
+                <button mat-raised-button color="accent" (click)="search(true)">
+                  <mat-icon style="color:white">search</mat-icon>Search
+                </button>
+              </mat-card-actions>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+      <!-- / SEARCH -->
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+    <div
+      class="empty-data content-card mat-white-bg"
+      *ngIf="messagesSearchResult.notifications.length == 0"
+    >
+      The search filter did not match any results.
+    </div>
+    <div
+      class="content-card mat-white-bg"
+      *ngIf="messagesSearchResult.notifications.length > 0"
+    >
+      <mat-table
+        #table
+        [dataSource]="messagesDataSource"
+        matSort
+        (matSortChange)="sortData($event)"
+        [@animateStagger]="{ value: '50' }"
+        fusePerfectScrollbar
+      >
+        <!-- Title Column -->
+        <ng-container cdkColumnDef="title">
+          <mat-header-cell
+            *cdkHeaderCellDef
+            mat-sort-header="Notification.Sender.FirstName"
+            >From</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.title }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!--Body Column -->
+        <ng-container cdkColumnDef="body">
+          <mat-header-cell *cdkHeaderCellDef>body</mat-header-cell>
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.body }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Message Date Column -->
+        <ng-container cdkColumnDef="date">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="CreatedAt"
+            >Received At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.date | dateFormatter }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container cdkColumnDef="status">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="Status"
+            >Status</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.status }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Read At Column -->
+        <ng-container cdkColumnDef="readAt">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header="ReadAt"
+            >Read At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let message">
+            <p class="text-truncate">{{ message.readAt | dateFormatter }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Read At Column -->
+        <ng-container cdkColumnDef="actions">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let message">
+            <button mat-icon-button (click)="openDeleteMessageDialog(message)">
+              <mat-icon aria-label="Delete message">delete_forever</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row
+          *cdkHeaderRowDef="displayedColumns"
+          class="mat-accent-bg"
+        ></mat-header-row>
+        <!-- [routerLink]="'/app/message-details/'+message.id" -->
+        <mat-row title="click row to view full details of message"
+          *cdkRowDef="let message; columns: displayedColumns"
+          matRipple
+          (click)="viewMessage(message)"
+          [class.message-new]="message.status == 'NEW'"
+          [class.mat-row-selected]="selectedMessage == message"
+        >
+        </mat-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="messagesSearchResult.metadata.totalCount"
+        [pageIndex]="criteriaFilter.page_index"
+        [pageSize]="criteriaFilter.limit"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="PaginationChanged($event)"
+      >
+      </mat-paginator>
+    </div>
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+
+  <ng-template #viewMessageDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Message Details</div>
+      <mat-dialog-content>
+        <div class="label">{{ selectedMessage.body }}</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+
+  <ng-template #deleteMessageDialogTemplate>
+    <div>
+      <div class="mat-accent-bg dialog-header">Confirm Deleting</div>
+      <mat-dialog-content>
+        <div class="label">Are you sure to delete selected message ?</div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="py-4" fxLayout="row-reverse">
+        <button mat-raised-button [mat-dialog-close]="true" color="warn">
+          Delete
+        </button>
+        <button mat-raised-button mat-dialog-close>Back</button>
+      </mat-dialog-actions>
+    </div>
+  </ng-template>
+</div>

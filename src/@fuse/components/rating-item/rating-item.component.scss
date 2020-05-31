@@ -1,0 +1,15 @@
+@import "src/@fuse/scss/fuse";
+
+:host {
+  p {
+    display: inline-block;
+    padding: 0px 5px;
+    position: relative;
+    top: 5px;
+  }
+  .mat-icon.rating {
+    color: black;
+    width: 15px;
+    min-width: 15px;
+  }
+}

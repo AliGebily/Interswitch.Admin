@@ -1,0 +1,15 @@
+<fuse-main></fuse-main>
+
+<div class="content-loading-shade" *ngIf="isConnectingToServer">
+    <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="previewImageSrc">
+    <div class="overlay-bg" (click)="previewImageSrc = null;">
+    </div>
+    <div class="img-preview-container">
+        <img class="preview" [src]="previewImageSrc | imageSrc">
+        <a href="javascript:;" (click)="previewImageSrc = null;" class="close">
+            <mat-icon>close</mat-icon>
+        </a>
+    </div>
+</div>

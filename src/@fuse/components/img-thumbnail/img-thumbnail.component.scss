@@ -1,0 +1,9 @@
+@import 'src/@fuse/scss/fuse';
+
+:host {
+  img {
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}

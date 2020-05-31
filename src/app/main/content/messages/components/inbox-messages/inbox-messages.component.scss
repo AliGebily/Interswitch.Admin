@@ -1,0 +1,24 @@
+@import 'src/@fuse/scss/fuse';
+
+:host {
+  .mat-column-title {
+    min-width: 120px;
+    max-width: 120px;
+  }
+  .mat-column-body {
+    margin-right: 20px;
+  }
+  .mat-column-status {
+    min-width: 80px;
+    max-width: 80px;
+  }
+  .mat-column-date,
+  .mat-column-readAt {
+    min-width: 170px;
+    max-width: 170px;
+  }
+  .mat-column-actions {
+    min-width: 30px;
+    max-width: 30px;
+  }
+}

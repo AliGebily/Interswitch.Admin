@@ -1,0 +1,29 @@
+@import 'src/@fuse/scss/fuse';
+
+:host {
+  .mat-column-senderDisplayName{
+    min-width: 120px;
+    max-width: 120px;
+  }
+  .mat-column-title {
+    min-width: 100px;
+    max-width: 100px;
+  }
+  .mat-column-body {
+    margin-right: 20px;
+  }
+  .mat-column-status {
+    min-width: 80px;
+    max-width: 80px;
+  }
+  .mat-column-date,
+  .mat-column-deliveredAt,
+  .mat-column-rejectedAt {
+    min-width: 170px;
+    max-width: 170px;
+  }
+  .mat-column-actions {
+    min-width: 90px;
+    max-width: 90px;
+  }
+}

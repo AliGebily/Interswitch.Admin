@@ -1,0 +1,37 @@
+@import 'src/@fuse/scss/fuse';
+
+:host {
+  .mat-column-index,
+  {
+    min-width: 40px;
+    max-width: 40px;
+  }
+  .mat-column-name,
+  {
+    min-width: 170px;
+    max-width: 170px;
+  }
+  .mat-column-team,
+  .mat-column-region {
+    min-width: 100px;
+    max-width: 100px;
+  }
+  .mat-column-quarterlyTargetCurrency,
+  .mat-column-quarterlyAchievedCurrency,
+  .mat-column-yearlyTargetCurrency,
+  .mat-column-yearlyAchievedCurrency,
+  .mat-column-quarterlyAchievedPercent,
+  .mat-column-yearlyAchievedPercent, {
+    min-width: 120px;
+    max-width: 120px;
+  }
+
+  // add this class to display missing columns of row width > screen width
+  .mat-header-row, .mat-row {
+    display: inline-flex;
+}
+  // .mat-column-actions {
+  //   min-width: 50px;
+  //   max-width: 50px;
+  // }
+}

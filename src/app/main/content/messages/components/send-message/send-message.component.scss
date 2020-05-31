@@ -1,0 +1,174 @@
+#message-details-page {
+  .mat-icon.delivered {
+    color: rgba(0, 150, 0, 1);
+    position: relative;
+    top: 5px;
+  }
+  .header {
+    .header-delivered-icon {
+      background-color: white;
+    }
+
+    .view-profile-link {
+      color: inherit;
+      .mat-icon {
+        color: #03a9f4;
+        border-radius: 50%;
+        background-color: white;
+        margin-left: 5px;
+        position: relative;
+        top: 7px;
+      }
+    }
+    .suspend-activate-container {
+      float: right;
+    }
+  }
+  .suspension-details {
+    .account-suspended {
+      font-weight: bold;
+      color: red;
+    }
+    .suspension-date {
+      float: right;
+    }
+    .suspension-reason {
+      padding-top: 10px;
+      .mat-icon {
+        position: relative;
+        top: 7px;
+      }
+    }
+  }
+  .view-profile-content {
+    margin-top: 10px;
+  }
+  .field-vertical-label {
+    border-bottom: solid 1px;
+    padding-bottom: 10px;
+    font-weight: bold;
+    margin: 10px 0px;
+    font-size: 1.2rem;
+  }
+  .field-vertical-value {
+    border: solid 1px;
+    width: auto;
+    padding: 5px 5px;
+    height: 30px;
+    margin-top: 10px;
+  }
+  .average-response-time {
+    margin-top: 20px;
+    font-weight: bold;
+  }
+  .field-horizontal-label {
+    display: inline-block;
+    width: 150px;
+    font-weight: bold;
+    margin: 5px 0px;
+    font-size: 1.2rem;
+  }
+  .field-horizontal-value {
+    border: solid 1px;
+    width: 300px;
+    padding: 5px 5px;
+    margin: 2px 0px;
+    height: 30px;
+  }
+  .message-photo {
+    max-height: 50px;
+    max-width: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  .more-details-tab-group {
+    margin-top: 30px;
+
+    .national-id-tab {
+      .title {
+        margin-top: 0px;
+        margin-bottom: 10px;
+      }
+      .rejection-details {
+        .expand-rejection-details-link {
+          float: right;
+          .mat-icon {
+            background-color: black;
+            color: white;
+            border-radius: 50%;
+          }
+        }
+        .rejection-reason {
+          font-weight: bold;
+          span {
+            margin-left: 20px;
+            color: red;
+          }
+        }
+        .submission-date,
+        .rejection-date {
+          float: right;
+        }
+        .rejection-comment {
+          .mat-icon {
+            position: relative;
+            top: 7px;
+          }
+        }
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: solid 1px;
+      }
+      .field-horizontal-label {
+        width: auto;
+      }
+      .field-horizontal-value {
+        width: auto;
+        margin-left: 10px;
+      }
+      .submission-message-date {
+        float: right;
+      }
+      .national-id-images {
+        margin-top: 5px;
+        img {
+          margin: 5px;
+          width: 100px;
+          height: 100px;
+        }
+      }
+    }
+    .payout-tab {
+      .mat-radio-group {
+        .mat-radio-button {
+          margin-right: 20px;
+        }
+      }
+      .bank-account-details {
+        margin-top: 10px;
+        margin-left: 20px;
+      }
+    }
+  }
+  .actions-buttons {
+    // position: absolute;
+    // z-index: 2;
+    // right: 0px;
+    // bottom: 5px;
+    .reject-deliver-button {
+      margin-right: 10px;
+    }
+  }
+  .message-activities-tab-group-container {
+    #carsTab {
+      .mat-column-requests,
+      .mat-column-trips,
+      .mat-column-reviews {
+        max-width: 100px;
+      }
+      .mat-column-car {
+        min-width: 200px;
+      }
+    }
+  }
+}
